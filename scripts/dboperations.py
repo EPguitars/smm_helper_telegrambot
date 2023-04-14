@@ -37,14 +37,12 @@ class Channels(Base):
     __table__ = sa.Table('channels', Base.metadata, autoload_with=engine)
 
 
-
-def get_categories() -> list:
-    """
-    This function gets users data from db
+def get_categories() -> list: 
+    """ 
+    Возвращает список категорий из бд 
     """
     session = Session(bind=engine)
     
-
     dbdata = select(Categories)
     result = [x.name for x in session.scalars(dbdata)]
     session.close()
@@ -53,9 +51,9 @@ def get_categories() -> list:
     return result
 
 
-def add_category(category_name: str):
+def add_category(category_name: str) -> None:
     """
-    This function updates db with new dialogue
+    Добавляет категорию в бд
     """
     session = Session(bind=engine)
 
@@ -69,9 +67,9 @@ def add_category(category_name: str):
     session.commit()
     session.close()
 
-def delete_category(category_name: str):
+def delete_category(category_name: str) -> None:
     """
-    This function deletes db record
+    Удаляет категорию из бд
     """
     session = Session(bind=engine)
     record = session.query(Categories).filter_by(name=category_name).first()
@@ -81,5 +79,27 @@ def delete_category(category_name: str):
 
     session.commit()
     session.close()
-    return True
+    
+
+def get_channels(category_name: str) -> list:
+    session = Session(bind=engine)
+
+    dbdata = select(Channels).filter_by(category = category_name)
+    result = [x.link for x in session.scalars(dbdata)]
+    session.close()
+
+    return result
+
+def add_channel(category_name: str, link: str) -> None:
+    session = Session(bind=engine)
+
+    record = session.query(Channels).filter_by(link=link).first()
+
+    if record is None:
+        channel = Channels(link=link, category=category_name)
+        session.add(channel)
+        session.commit()
+    
+    else:
+        print(f"{Fore.CYAN}{Style.BRIGHT}ALREADY SATISFIED")
 
