@@ -81,4 +81,5 @@ def delete_category(category_name: str):
 
     session.commit()
     session.close()
+    return True
 
